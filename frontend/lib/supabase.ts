@@ -1,15 +1,29 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+export function isSupabaseConfigured(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+  return (
+    Boolean(url) &&
+    url !== "YOUR_SUPABASE_PROJECT_URL" &&
+    Boolean(key) &&
+    key !== "YOUR_SUPABASE_PUBLISHABLE_KEY"
+  );
+}
 
-export const isSupabaseConfigured =
-  Boolean(supabaseUrl) &&
-  supabaseUrl !== "YOUR_SUPABASE_PROJECT_URL" &&
-  Boolean(supabaseAnonKey) &&
-  supabaseAnonKey !== "YOUR_SUPABASE_PUBLISHABLE_KEY";
+let cachedClient: SupabaseClient | null = null;
 
-export const supabase = createClient(
-  isSupabaseConfigured ? supabaseUrl : "https://placeholder.supabase.co",
-  isSupabaseConfigured ? supabaseAnonKey : "placeholder"
-);
+export function getSupabaseClient(): SupabaseClient {
+  if (cachedClient) return cachedClient;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+
+  const validUrl = isSupabaseConfigured() ? url : "https://placeholder.supabase.co";
+  const validKey = isSupabaseConfigured() ? key : "placeholder";
+
+  cachedClient = createClient(validUrl, validKey);
+  return cachedClient;
+}
+
+export const supabase = getSupabaseClient();

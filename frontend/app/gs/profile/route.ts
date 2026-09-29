@@ -53,8 +53,9 @@ export async function PUT(req: Request) {
     return NextResponse.json(profile);
   } catch (err) {
     console.error("[profile PUT error]:", err);
+    const msg = err instanceof Error ? err.message : "Could not save photo. Please try again.";
     return NextResponse.json(
-      { error: "Could not save photo. Please try again." },
+      { error: msg },
       { status: 500 }
     );
   }
