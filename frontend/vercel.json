@@ -1,0 +1,24 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "regions": ["sin1"],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ],
+  "env": {
+    "GOOGLE_ATTENDANCE_API_URL": "@google_attendance_api_url",
+    "SESSION_SECRET": "@session_secret",
+    "ALLOWED_SECTIONS": "3A,3B,5A,5B,7A,7B",
+    "ATTENDANCE_CACHE_TTL_MS": "60000"
+  }
+}
