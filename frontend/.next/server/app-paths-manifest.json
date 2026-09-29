@@ -1,13 +1,10 @@
 {
-  "/gs/auth/login/route": "app/gs/auth/login/route.js",
-  "/gs/attendance/route": "app/gs/attendance/route.js",
   "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
+  "/gs/attendance/route": "app/gs/attendance/route.js",
   "/gs/profile/route": "app/gs/profile/route.js",
-  "/gs/auth/logout/route": "app/gs/auth/logout/route.js",
   "/page": "app/page.js",
   "/welcome/page": "app/welcome/page.js",
   "/(app)/dashboard/page": "app/(app)/dashboard/page.js",
   "/(app)/subjects/page": "app/(app)/subjects/page.js",
-  "/(app)/forecast/page": "app/(app)/forecast/page.js",
   "/(app)/profile/page": "app/(app)/profile/page.js"
 }
