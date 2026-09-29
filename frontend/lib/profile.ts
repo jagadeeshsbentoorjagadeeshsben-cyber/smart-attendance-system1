@@ -16,39 +16,71 @@ export interface StoredProfile {
 
 const COLLECTION = "profiles";
 
+// Persist in-memory store across hot-reloads in dev / server instance
+const g = globalThis as unknown as {
+  __gmitProfileCache?: Map<string, StoredProfile>;
+};
+const memoryStore: Map<string, StoredProfile> =
+  g.__gmitProfileCache ?? (g.__gmitProfileCache = new Map());
+
 export async function getProfile(usn: string): Promise<StoredProfile> {
-  const db = await getDb();
-  const doc = await db
-    .collection<StoredProfile>(COLLECTION)
-    .findOne({ usn }, { projection: { _id: 0 } });
-  return doc ?? { usn, photo: null, updatedAt: new Date(0).toISOString() };
+  if (process.env.MONGO_URL) {
+    try {
+      const db = await getDb();
+      const doc = await db
+        .collection<StoredProfile>(COLLECTION)
+        .findOne({ usn }, { projection: { _id: 0 } });
+      if (doc) return doc;
+    } catch (err) {
+      console.warn("[profile] MongoDB fetch failed, using memory store:", err);
+    }
+  }
+  return memoryStore.get(usn) ?? { usn, photo: null, updatedAt: new Date(0).toISOString() };
 }
 
 export async function setProfilePhoto(
   usn: string,
   photo: string
 ): Promise<StoredProfile> {
-  const db = await getDb();
   const updatedAt = new Date().toISOString();
-  await db
-    .collection<StoredProfile>(COLLECTION)
-    .updateOne(
-      { usn },
-      { $set: { usn, photo, updatedAt } },
-      { upsert: true }
-    );
-  return { usn, photo, updatedAt };
+  const profile: StoredProfile = { usn, photo, updatedAt };
+  memoryStore.set(usn, profile);
+
+  if (process.env.MONGO_URL) {
+    try {
+      const db = await getDb();
+      await db
+        .collection<StoredProfile>(COLLECTION)
+        .updateOne(
+          { usn },
+          { $set: { usn, photo, updatedAt } },
+          { upsert: true }
+        );
+    } catch (err) {
+      console.warn("[profile] MongoDB save failed, saved to memory fallback:", err);
+    }
+  }
+  return profile;
 }
 
 export async function removeProfilePhoto(usn: string): Promise<StoredProfile> {
-  const db = await getDb();
   const updatedAt = new Date().toISOString();
-  await db
-    .collection<StoredProfile>(COLLECTION)
-    .updateOne(
-      { usn },
-      { $set: { usn, photo: null, updatedAt } },
-      { upsert: true }
-    );
-  return { usn, photo: null, updatedAt };
+  const profile: StoredProfile = { usn, photo: null, updatedAt };
+  memoryStore.set(usn, profile);
+
+  if (process.env.MONGO_URL) {
+    try {
+      const db = await getDb();
+      await db
+        .collection<StoredProfile>(COLLECTION)
+        .updateOne(
+          { usn },
+          { $set: { usn, photo: null, updatedAt } },
+          { upsert: true }
+        );
+    } catch (err) {
+      console.warn("[profile] MongoDB remove failed, updated memory fallback:", err);
+    }
+  }
+  return profile;
 }

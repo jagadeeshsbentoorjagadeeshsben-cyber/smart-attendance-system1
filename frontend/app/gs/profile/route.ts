@@ -19,8 +19,15 @@ export async function GET() {
   if (!session) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
-  const profile = await getProfile(session.usn);
-  return NextResponse.json(profile);
+  try {
+    const profile = await getProfile(session.usn);
+    return NextResponse.json(profile);
+  } catch (err) {
+    console.error("[profile GET error]:", err);
+    return NextResponse.json(
+      { usn: session.usn, photo: null, updatedAt: new Date(0).toISOString() }
+    );
+  }
 }
 
 export async function PUT(req: Request) {
@@ -41,8 +48,16 @@ export async function PUT(req: Request) {
       { status: 400 }
     );
   }
-  const profile = await setProfilePhoto(session.usn, parsed.data.photo);
-  return NextResponse.json(profile);
+  try {
+    const profile = await setProfilePhoto(session.usn, parsed.data.photo);
+    return NextResponse.json(profile);
+  } catch (err) {
+    console.error("[profile PUT error]:", err);
+    return NextResponse.json(
+      { error: "Could not save photo. Please try again." },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE() {
@@ -50,6 +65,14 @@ export async function DELETE() {
   if (!session) {
     return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
   }
-  const profile = await removeProfilePhoto(session.usn);
-  return NextResponse.json(profile);
+  try {
+    const profile = await removeProfilePhoto(session.usn);
+    return NextResponse.json(profile);
+  } catch (err) {
+    console.error("[profile DELETE error]:", err);
+    return NextResponse.json(
+      { error: "Could not remove photo. Please try again." },
+      { status: 500 }
+    );
+  }
 }
