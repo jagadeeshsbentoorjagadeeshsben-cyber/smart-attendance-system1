@@ -13,7 +13,7 @@ services:
       - key: DB_NAME
         value: smart_attendance
       - key: CORS_ORIGINS
-        value: https://gmit-attendance.vercel.app,http://localhost:3000
+        value: https://YOUR-PROJECT.vercel.app,http://localhost:3000
       - key: PYTHON_VERSION
         value: "3.11.0"
     healthCheckPath: /api/
