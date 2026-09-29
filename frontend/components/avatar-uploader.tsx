@@ -6,8 +6,8 @@ import { useProfile } from "./profile-provider";
 import { ProfileAvatar } from "./profile-avatar";
 import { Button } from "./ui/button";
 
-const ALLOWED = ["image/png", "image/jpeg", "image/webp", "image/gif"];
-const MAX_BYTES = 2 * 1024 * 1024;
+const ALLOWED = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"];
+const MAX_BYTES = 5 * 1024 * 1024;
 
 export function AvatarUploader({ name }: { name: string }) {
   const { photo, setPhoto, removePhoto, saving } = useProfile();
@@ -23,7 +23,7 @@ export function AvatarUploader({ name }: { name: string }) {
       return;
     }
     if (file.size > MAX_BYTES) {
-      setError("Image must be under 2 MB.");
+      setError("Image must be under 5 MB.");
       return;
     }
     const reader = new FileReader();

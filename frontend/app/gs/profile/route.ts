@@ -6,7 +6,7 @@ import { getProfile, setProfilePhoto, removeProfilePhoto } from "@/lib/profile";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_LEN = 3_500_000; // ~2.6MB decoded
+const MAX_LEN = 7_500_000; // ~5MB image decoded in base64
 const putSchema = z.object({
   photo: z
     .string()
