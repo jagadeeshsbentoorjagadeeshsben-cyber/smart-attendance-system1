@@ -1,41 +1,35 @@
-import { forwardRef } from "react";
+import * as React from "react";
 import { cn } from "@/lib/utils";
-
-type Variant = "primary" | "secondary" | "ghost" | "danger";
-type Size = "sm" | "md" | "lg";
-
-const variants: Record<Variant, string> = {
-  primary:
-    "bg-royal text-white hover:bg-royal/90 active:scale-[0.98] shadow-subtle",
-  secondary:
-    "bg-surface text-ink border border-border hover:bg-surface-2 active:scale-[0.98]",
-  ghost: "text-muted hover:text-ink hover:bg-surface-2",
-  danger:
-    "bg-danger/10 text-danger hover:bg-danger/15 active:scale-[0.98] border border-danger/20",
-};
-
-const sizes: Record<Size, string> = {
-  sm: "h-9 px-3.5 text-sm rounded-md gap-1.5",
-  md: "h-11 px-5 text-sm rounded-md gap-2",
-  lg: "h-12 px-6 text-[15px] rounded-lg gap-2",
-};
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
-  size?: Size;
+  variant?: "default" | "outline" | "ghost" | "danger" | "secondary";
+  size?: "default" | "sm" | "lg";
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", size = "md", ...props }, ref) => {
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = "default", size = "default", ...props }, ref) => {
+    const variantStyles = {
+      default: "bg-royal text-white hover:bg-royal/90 shadow-sm",
+      secondary: "bg-surface-2 text-ink hover:bg-surface border border-border shadow-sm",
+      outline: "border border-border bg-surface hover:bg-surface-2 text-ink",
+      ghost: "hover:bg-surface-2 text-muted hover:text-ink",
+      danger: "bg-rose-600 text-white hover:bg-rose-700 shadow-sm",
+    };
+
+    const sizeStyles = {
+      default: "h-9 px-4 py-2 text-xs",
+      sm: "h-7 px-3 text-[11px]",
+      lg: "h-11 px-6 text-sm",
+    };
+
     return (
       <button
         ref={ref}
-        suppressHydrationWarning
         className={cn(
-          "inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-royal",
-          variants[variant],
-          sizes[size],
+          "inline-flex items-center justify-center gap-1.5 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer",
+          variantStyles[variant],
+          sizeStyles[size],
           className
         )}
         {...props}
@@ -44,17 +38,3 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 Button.displayName = "Button";
-
-/** shared class string so <Link> can look like a button */
-export function buttonClass(
-  variant: Variant = "primary",
-  size: Size = "md",
-  className?: string
-): string {
-  return cn(
-    "inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-royal",
-    variants[variant],
-    sizes[size],
-    className
-  );
-}

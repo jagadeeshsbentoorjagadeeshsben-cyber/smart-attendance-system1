@@ -3,9 +3,23 @@
 export default function GlobalError({
   reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  error?: Error & { digest?: string };
+  reset?: () => void;
 }) {
+  const handleRetry = () => {
+    if (typeof reset === "function") {
+      try {
+        reset();
+        return;
+      } catch {
+        // Fallback to page reload
+      }
+    }
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
+  };
+
   return (
     <html lang="en">
       <body className="min-h-screen flex items-center justify-center bg-[#F7F9FC] dark:bg-[#050B18] px-4 font-sans">
@@ -15,14 +29,14 @@ export default function GlobalError({
             Application Error
           </h2>
           <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-            An unexpected error occurred. Please try again.
+            An unexpected error occurred. Please refresh to restore your session.
           </p>
           <button
             type="button"
-            onClick={() => reset()}
-            className="mt-5 inline-block rounded-md bg-[#002147] px-4 py-2 text-xs font-semibold text-white shadow transition-all hover:bg-[#002147]/90"
+            onClick={handleRetry}
+            className="mt-5 inline-block rounded-md bg-[#002147] px-4 py-2 text-xs font-semibold text-white shadow transition-all hover:bg-[#002147]/90 active:scale-95 cursor-pointer"
           >
-            Try Again
+            Refresh & Retry
           </button>
         </div>
       </body>
